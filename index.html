@@ -56,6 +56,36 @@
             font-size: 1.5rem;
             color: var(--gold)
         }
+        /* PENGHITUNG USIA SINTA */
+        
+        .age-counter {
+            width: min(420px, 100%);
+            padding: 14px 18px;
+            border: 1px solid #ecc88650;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: 0 8px 25px #0003;
+        }
+        
+        .age-label {
+            font-family: Caveat, cursive;
+            font-size: 1.25rem;
+            color: var(--gold);
+            margin-bottom: 8px;
+        }
+        
+        #age-display {
+            font-size: clamp(.85rem, 3.5vw, 1.05rem);
+            line-height: 1.8;
+            color: var(--paper);
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .age-heart {
+            color: var(--rose);
+            font-size: 1.5rem;
+            margin-top: 5px;
+        }
         
         header {
             display: flex;
@@ -573,9 +603,20 @@
         </section>
         <section class="page" aria-labelledby="t1">
             <h2 id="t1">Ada surat buatmu.</h2>
+
             <button id="env" aria-label="Buka amplop">💌</button>
+
             <p>Ketuk amplopnya.</p>
+
+            <!-- Hitung mundur ulang tahun ke-20 -->
             <p class="hand" id="cd" aria-live="off"></p>
+
+            <!-- Penghitung usia sejak tanggal lahir -->
+            <div class="age-counter">
+                <p class="age-label">Sejak hari pertama kamu hadir di dunia...</p>
+                <p id="age-display" aria-live="off">Menghitung usiamu...</p>
+                <p class="age-heart">♡</p>
+            </div>
         </section>
         <section class="page" aria-labelledby="t2">
             <h2 id="t2">Dari aku, untukmu</h2>
@@ -1423,7 +1464,119 @@
         // ==========================================
 
         let currentVideoIndex = 0;
+
+        // hitung mundur ke ulang tahun ke-20
+        function tick() {
+            const d = new Date(...C.birth) - new Date();
+            const el = $('#cd');
+            if (d <= 0) {
+                el.textContent = 'Hari ini kamu resmi 20 tahun. 🎂';
+                return
+            }
+            const h = Math.floor(d / 36e5),
+                m = Math.floor(d % 36e5 / 6e4),
+                s = Math.floor(d % 6e4 / 1e3);
+            el.textContent = `Menuju 20 tahunmu: ${h} jam ${m} menit ${s} detik`
+        }
+        tick();
+        setInterval(tick, 1000);
+        // hitung mundur ke ulang tahun ke-20
+        function tick() {
+            const d = new Date(...C.birth) - new Date();
+            const el = $('#cd');
+            if (d <= 0) {
+                el.textContent = 'Hari ini kamu resmi 20 tahun. 🎂';
+                return
+            }
+            const h = Math.floor(d / 36e5),
+                m = Math.floor(d % 36e5 / 6e4),
+                s = Math.floor(d % 6e4 / 1e3);
+            el.textContent = `Menuju 20 tahunmu: ${h} jam ${m} menit ${s} detik`
+        }
+        tick();
+        setInterval(tick, 1000);
+        // ==========================================
+        // PENGHITUNG USIA SINTA SEJAK TANGGAL LAHIR
+        // Tanggal lahir: 2 November 2006
+        // ==========================================
+
+        const sintaBirthDate = new Date(2006, 10, 2, 0, 0, 0);
+
+        function updateAgeDisplay() {
+            const now = new Date();
+            const el = $('#age-display');
+
+            if (!el) return;
+
+            if (now < sintaBirthDate) {
+                el.textContent = 'Menunggu hari kelahiran...';
+                return;
+            }
+
+            // Hitung tahun kalender
+            let years = now.getFullYear() - sintaBirthDate.getFullYear();
+
+            let anniversary = new Date(
+                sintaBirthDate.getFullYear() + years,
+                sintaBirthDate.getMonth(),
+                sintaBirthDate.getDate(),
+                0, 0, 0
+            );
+
+            if (anniversary > now) {
+                years--;
+                anniversary = new Date(
+                    sintaBirthDate.getFullYear() + years,
+                    sintaBirthDate.getMonth(),
+                    sintaBirthDate.getDate(),
+                    0, 0, 0
+                );
+            }
+
+            // Hitung bulan kalender
+            let months =
+                (now.getFullYear() - anniversary.getFullYear()) * 12 +
+                now.getMonth() - anniversary.getMonth();
+
+            let monthDate = new Date(
+                anniversary.getFullYear(),
+                anniversary.getMonth() + months,
+                anniversary.getDate(),
+                0, 0, 0
+            );
+
+            if (monthDate > now) {
+                months--;
+                monthDate = new Date(
+                    anniversary.getFullYear(),
+                    anniversary.getMonth() + months,
+                    anniversary.getDate(),
+                    0, 0, 0
+                );
+            }
+
+            // Hitung sisa hari, jam, menit, dan detik
+            let remaining = now - monthDate;
+
+            const days = Math.floor(remaining / 86400000);
+            remaining %= 86400000;
+
+            const hours = Math.floor(remaining / 3600000);
+            remaining %= 3600000;
+
+            const minutes = Math.floor(remaining / 60000);
+            remaining %= 60000;
+
+            const seconds = Math.floor(remaining / 1000);
+
+            el.textContent =
+                `${years} tahun ${months} bulan ${days} hari ` +
+                `${hours} jam ${minutes} menit ${seconds} detik`;
+        }
+
+        updateAgeDisplay();
+        setInterval(updateAgeDisplay, 1000);
     </script>
 </body>
 
-</html>/
+</html>
