@@ -665,10 +665,10 @@
             bye: "Di semesta mana pun, aku tetap pilih kamu, Sinta. ♡ Ibah",
             // Database: isi dari Supabase (lihat panduan). Kosong = hanya simpan di perangkat + unduh kartu.
             save: {
-                save: {
-                    url: "https://jkjlzqfcuncmcrrwjoge.supabase.co",
-                    key: "sb_publishable_Wte0RyGqpjgs1OyCtxHn8Q_ZUd3AzyE"
-                }
+                url: "https://jkjlzqfcuncmcrrwjoge.supabase.co",
+                key: "sb_publishable_Wte0RyGqpjgs1OyCtxHn8Q_ZUd3AzyE",
+                ownerId: "200e152b-943c-469f-9677-6c2a0d0812fc"
+
             }
         };
         // =====================================================================
@@ -1288,40 +1288,104 @@
             }), 90, 610);
             x.textAlign = 'center';
             x.fillText('Disimpan oleh Ibah Misbah ♡', 500, 655);
+
+            // 1. Buat file PNG dari sertifikat
+            const blob = await new Promise(resolve => {
+                c.toBlob(resolve, 'image/png');
+            });
+
+            if (!blob) {
+                st.textContent = 'Gagal membuat sertifikat. Silakan coba lagi.';
+                return;
+            }
+
+            // 2. Unduh sertifikat ke perangkat
+            const localUrl = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = c.toDataURL('image/png');
+
+            a.href = localUrl;
             a.download = 'harapan-sinta-20.png';
             a.click();
+
+            setTimeout(() => URL.revokeObjectURL(localUrl), 10000);
+
+            // 3. Siapkan data harapan
+            const fileName = `harapan-${Date.now()}.png`;
+            const certificatePath = `${C.save.ownerId}/${fileName}`;
+
             const rec = {
                 name: C.name,
                 wish: w,
-                signature: sg.toDataURL('image/png')
+                signature: sg.toDataURL('image/png'),
+                certificate_path: certificatePath
             };
+
+            // 4. Simpan salinan lokal
             try {
-                localStorage.setItem('harapan', JSON.stringify(rec))
-            } catch {}
-            if (!C.save.url) {
-                st.textContent = 'Kartu terunduh dan tersimpan di perangkat ini.';
-                return
+                localStorage.setItem('harapan', JSON.stringify(rec));
+            } catch (e) {
+                console.warn('Local storage tidak tersedia:', e);
             }
-            st.textContent = 'Mengirim…';
+
+            // 5. Periksa konfigurasi
+            if (!C.save.url || !C.save.key || !C.save.ownerId) {
+                st.textContent = 'Sertifikat terunduh, tetapi Supabase belum dikonfigurasi.';
+                return;
+            }
+
+            st.textContent = 'Mengunggah sertifikat dan mengirim harapan...';
+
             try {
-                const r = await fetch(C.save.url + '/rest/v1/wishes', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        apikey: C.save.key,
-                        Authorization: 'Bearer ' + C.save.key,
-                        Prefer: 'return=minimal'
-                    },
-                    body: JSON.stringify(rec)
-                });
-                if (!r.ok) throw 0;
-                st.textContent = 'Terkirim ke Ibah ♡ Kartunya juga sudah terunduh.';
-                burst('💌', 10)
-            } catch {
-                st.textContent = 'Belum terkirim (cek koneksi). Kartunya sudah terunduh; coba tekan lagi.'
+                // 6. Upload sertifikat ke Supabase Storage
+                const uploadResponse = await fetch(
+                    `${C.save.url}/storage/v1/object/certificates/${certificatePath}`, {
+                        method: 'POST',
+                        headers: {
+                            apikey: C.save.key,
+                            Authorization: 'Bearer ' + C.save.key,
+                            'Content-Type': 'image/png',
+                            'x-upsert': 'false'
+                        },
+                        body: blob
+                    }
+                );
+
+                if (!uploadResponse.ok) {
+                    throw new Error('Upload sertifikat gagal: ' +
+                        await uploadResponse.text());
+                }
+
+                // 7. Simpan data ke tabel wishes
+                const dbResponse = await fetch(
+                    `${C.save.url}/rest/v1/wishes`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            apikey: C.save.key,
+                            Authorization: 'Bearer ' + C.save.key,
+                            Prefer: 'return=minimal'
+                        },
+                        body: JSON.stringify(rec)
+                    }
+                );
+
+                if (!dbResponse.ok) {
+                    throw new Error('Penyimpanan database gagal: ' +
+                        await dbResponse.text());
+                }
+
+                // 8. Konfirmasi berhasil
+                st.textContent =
+                    'Harapan berhasil dikirim ke Ibah ♡ Sertifikat tersimpan online dan terunduh.';
+                burst('💌', 10);
+
+            } catch (error) {
+                console.error('Kesalahan Supabase:', error);
+
+                st.textContent =
+                    'Sertifikat sudah terunduh, tetapi belum berhasil tersimpan online. Silakan coba lagi.';
             }
+
         }
         $('#ssave').onclick = saveWish;
         candles();
