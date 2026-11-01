@@ -242,7 +242,7 @@
 
         // MENCEGAH HTML DARI INPUT PENGUNJUNG
         function escapeHTML(value) {
-            return String(value ? ? '').replace(/[&<>"']/g, char => ({
+            return String(value ?? '').replace(/[&<>"']/g, char => ({
                 '&': '&amp;',
                 '<': '&lt;',
                 '>': '&gt;',
@@ -364,7 +364,7 @@
                         .from('certificates')
                         .createSignedUrl(item.certificate_path, 300);
 
-                    if (!fileError && fileData ? .signedUrl) {
+                    if (!fileError && fileData?.signedUrl) {
                         certificateLink = `
                         <a class="download"
                            href="${escapeHTML(fileData.signedUrl)}"
