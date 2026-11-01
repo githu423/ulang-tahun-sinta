@@ -559,6 +559,60 @@
             pointer-events: none;
         }
         /* Gambar halaman pertama */
+        /* TOMBOL KENANGAN SPESIAL */
+        
+        .memory-button-container {
+            width: min(420px, 100%);
+            margin: 12px auto 5px;
+            display: grid;
+            justify-items: center;
+            gap: 8px;
+        }
+        
+        .memory-caption {
+            font-family: Caveat, cursive;
+            font-size: 1.35rem;
+            color: var(--gold);
+        }
+        
+        .memory-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 12px 24px;
+            border-radius: 50px;
+            text-decoration: none;
+            color: #2a0a16;
+            font-weight: 600;
+            background: linear-gradient(135deg, #ffc1d1, #ee7b98);
+            border: 1px solid #ffdce5;
+            box-shadow: 0 8px 24px #ee7b9850;
+            transition: transform .3s ease, box-shadow .3s ease;
+            animation: memoryPulse 2.5s ease-in-out infinite;
+        }
+        
+        .memory-button:hover {
+            transform: translateY(-3px) scale(1.04);
+            box-shadow: 0 12px 30px #ee7b9880;
+        }
+        
+        .memory-subcaption {
+            font-family: Caveat, cursive;
+            font-size: 1.15rem;
+            color: var(--paper);
+            opacity: .85;
+        }
+        
+        @keyframes memoryPulse {
+            0%,
+            100% {
+                box-shadow: 0 8px 24px #ee7b9850;
+            }
+            50% {
+                box-shadow: 0 8px 30px #ee7b9890;
+            }
+        }
     </style>
 </head>
 
@@ -632,7 +686,25 @@
             <h2 id="t4">Kita, dalam bingkai kecil</h2>
             <div class="grid" id="grid"></div>
             <p class="hand">Buka satu foto.</p>
+
+            <!-- KENANGAN SPESIAL -->
+            <div class="memory-button-container">
+                <p class="memory-caption">
+                    Tapi, cerita kita tidak berhenti di sini...
+                </p>
+
+                <a href="https://harigirlfriend.vercel.app/" class="memory-button" target="_blank" rel="noopener noreferrer">
+                    <span>💗</span>
+                    <span>Buka Kenangan Kita</span>
+                    <span>↗</span>
+                </a>
+
+                <p class="memory-subcaption">
+                    Ada cerita lain yang ingin aku kenang bersamamu ♡
+                </p>
+            </div>
         </section>
+
         <section class="page" aria-labelledby="t5">
             <h2 id="t5">Tahan hatinya sampai penuh</h2>
             <button id="hold" aria-label="Tahan untuk mengisi hati"><span>❤</span></button>
@@ -675,7 +747,7 @@
             eren: "media/image.png", // foto Eren/fan art, mis. "media/eren.webp" (kosong = ikon)
             gateKicker: "Sebelum masuk…",
             gate: "Ini benar kamu, Sinta Liya?",
-            letter: "Selamat ulang tahun yang ke-20, Sinta Liya.\n\nDua puluh tahun lalu dunia kedatangan seseorang yang kelak jadi tempat paling nyaman buat aku pulang. Terima kasih sudah sabar, sudah tertawa, dan sudah memilih aku.\n\nSemoga usia 20 ini ramah padamu: mimpimu dekat, hatimu tenang, dan aku boleh terus ada di sampingmu.\n\n— Ibah Misbah",
+            letter: "Selamat ulang tahun yang ke-20, sayangku❤️.\n\nDua puluh tahun lalu dunia kedatangan seseorang yang kelak jadi tempat paling nyaman buat aku pulang. Terima kasih sudah sabar, sudah tertawa, dan sudah memilih aku.\n\nSemoga usia 20 ini ramah padamu: mimpimu dekat, hatimu tenang, dan aku boleh terus ada di sampingmu.\n\n— Ibah Misbah",
             roses: ["Kamu bikin hal biasa terasa istimewa.", "Tawamu itu favoritku.", "Kamu sabar, bahkan saat aku susah dimengerti.", "Kamu pegang tanganku saat aku ragu.", "Kamu bikin rumah bukan soal tempat.", "Di semesta mana pun, aku tetap pilih kamu."],
             photos: [ // src diisi mis. "media/foto1.jpg"; kosong = bingkai penanda
                 {
